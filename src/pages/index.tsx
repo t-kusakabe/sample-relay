@@ -1,36 +1,22 @@
 import { useState, useEffect } from 'react';
-import fetchGraphQL from '../lib/fetchGraphQL';
+import { fetchQuery } from 'react-relay';
+import { initEnvironment } from '../lib/relay';
+import repositoryQuery from '../queries/repository';
 
-const Home = () => {
-  const [name, setName] = useState(null);
+export const getServerSideProps = async () => {
+  const environment = initEnvironment();
+  const queryProps = await fetchQuery(environment, repositoryQuery, {}).toPromise();
 
-  useEffect(() => {
-    let isMounted = true;
+  return {
+    props: {
+      ...queryProps
+    }
+  };
+};
 
-    fetchGraphQL(`
-      query RepositoryNameQuery {
-        repository(owner: "owner", name: "repository_name") {
-          name
-        }
-      }
-    `).then((response) => {
-      if (!isMounted) {
-        return;
-      }
-
-      const data = response.data;
-      setName(data.repository.name);
-    }).catch((error) => {
-      console.log(error);
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [fetchGraphQL]);
-
+const Home = (props) => {
   return (
-    <p>{name != null ? `Repository: ${name}` : "Loading"}</p>
+    <p>{props != null ? `Repository: ${props.repository.name}` : "Loading"}</p>
   );
 };
 
