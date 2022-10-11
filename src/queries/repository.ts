@@ -1,5 +1,4 @@
-// import { graphql } from 'react-relay';
-import graphql from 'babel-plugin-relay/macro';
+import { graphql } from 'react-relay';
 
 export default graphql`
   query repositoryQuery {
